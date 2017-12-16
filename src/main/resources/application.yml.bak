@@ -1,0 +1,87 @@
+spring:
+### profile
+  profiles:
+    active: dev
+### http encoding
+  http:
+    encoding:
+      force: true
+      force-request: true
+      force-response: true
+### ansi
+  output:
+      ansi:
+        enabled: always
+### thymeleaf
+  thymeleaf:
+    cache: false
+
+### 下面为连接池的补充设置，应用到所有数据源中
+  datasource:
+    type: com.alibaba.druid.pool.xa.DruidXADataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    # Druid 数据源配置，继承spring.datasource.* 配置，相同则覆盖
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      max-active: 10
+      min-idle: 1
+      initial-size: 5
+      max-wait: 60000
+      min-evictable-idle-time-millis: 100000
+      validation-query: SELECT 1
+      test-while-idle: true
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall,slf4j
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      use-global-data-source-stat: true
+      web-stat-filter:
+        enabled: true
+        url-pattern: /druid/
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+      aop-patterns: io.github.yidasanqian.service.*
+
+
+
+### jta相关参数配置
+  jta:
+    transaction-manager-id: txManager
+    log-dir: D:/logs/spring-boot-distributed-transaction/jta
+    atomikos:
+      properties:
+        log-base-dir: D:/logs/spring-boot-distributed-transaction/atomikos
+      datasource:
+        xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
+        primary-ds:
+          xa-properties:
+            url: jdbc:mysql://118.31.71.64:3306/vv2.0?useUnicode=true&characterEncoding=utf8
+            username: root
+            password: lly0123*..
+        business-ds:
+          xa-properties:
+            url: jdbc:mysql://localhost:3306/vv2.0?useUnicode=true&characterEncoding=utf8
+            username: root
+            password: root
+
+
+### mybatis
+mybatis:
+  type-aliases-package: io.github.yidasanqian.domain
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/*/*.xml
+### pagehelper
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+
+### logging
+logging:
+  file: D:/logs/spring-boot-distributed-transaction/dt
+management:
+  security:
+    enabled: false
+
+

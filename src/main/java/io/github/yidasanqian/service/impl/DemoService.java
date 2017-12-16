@@ -1,0 +1,54 @@
+package io.github.yidasanqian.service.impl;
+
+import io.github.yidasanqian.domain.Demo;
+import io.github.yidasanqian.mapper.business.BusinessDemoMapper;
+import io.github.yidasanqian.mapper.master.MasterDemoMapper;
+import io.github.yidasanqian.service.IDemoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+
+@Transactional(rollbackFor = Exception.class)
+@Service
+public class DemoService implements IDemoService {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    @Resource
+    private MasterDemoMapper masterDemoMapper;
+
+    @Resource
+    private BusinessDemoMapper businessDemoMapper;
+
+    @Override
+    public int save() throws Exception {
+        log.info("save");
+        Demo dsDemo = new Demo();
+        dsDemo.setName("xa事务测试");
+        int row = masterDemoMapper.save(dsDemo);
+        log.info("保存之后");
+        Demo dsDemo1 = new Demo();
+        dsDemo1.setName("xa事务测试2");
+        int row2 = businessDemoMapper.save(dsDemo1);
+        return row + row2;
+    }
+
+    @Override
+    public int save2() throws Exception {
+        log.info("save2");
+        Demo dsDemo = new Demo();
+        dsDemo.setName("xa事务回滚测试");
+        int row = masterDemoMapper.save(dsDemo);
+        log.info("保存之后异常");
+        int a = 1 / 0;
+
+        Demo dsDemo1 = new Demo();
+        dsDemo1.setName("xa事务回滚测试2");
+        int row2 = businessDemoMapper.save(dsDemo1);
+        return row + row2;
+    }
+}
