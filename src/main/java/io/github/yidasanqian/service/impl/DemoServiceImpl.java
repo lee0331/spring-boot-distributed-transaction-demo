@@ -3,7 +3,7 @@ package io.github.yidasanqian.service.impl;
 import io.github.yidasanqian.domain.Demo;
 import io.github.yidasanqian.mapper.business.BusinessDemoMapper;
 import io.github.yidasanqian.mapper.master.MasterDemoMapper;
-import io.github.yidasanqian.service.IDemoService;
+import io.github.yidasanqian.service.DemoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DemoService implements IDemoService {
+public class DemoServiceImpl implements DemoService {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 

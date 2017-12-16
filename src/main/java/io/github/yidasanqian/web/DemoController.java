@@ -1,6 +1,6 @@
 package io.github.yidasanqian.web;
 
-import io.github.yidasanqian.service.IDemoService;
+import io.github.yidasanqian.service.DemoService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 public class DemoController {
 
     @Resource
-    private IDemoService dsService;
+    private DemoService dsService;
 
     @RequestMapping("/testXaDatasource")
     public String testXaDatasource() {

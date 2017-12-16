@@ -3,7 +3,7 @@ package io.github.yidasanqian.service;
 /**
  * @author Linyu Chen
  */
-public interface IDemoService {
+public interface DemoService {
 
     int save() throws Exception;
 
