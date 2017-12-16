@@ -1,6 +1,12 @@
 package io.github.yidasanqian.domain;
 
-public class Demo {
+import java.io.Serializable;
+
+/**
+ * @author Linyu Chen
+ */
+public class Demo implements Serializable {
+    private static final long serialVersionUID = 8097597276750444748L;
     private Long id;
 
     private String name;

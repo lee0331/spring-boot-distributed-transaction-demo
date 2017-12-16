@@ -24,6 +24,12 @@ public class DemoServiceImpl implements DemoService {
     @Resource
     private BusinessDemoMapper businessDemoMapper;
 
+    /**
+     * 正常测试分布式事务
+     *
+     * @return
+     * @throws Exception
+     */
     @Override
     public int save() throws Exception {
         log.info("save");
@@ -37,6 +43,11 @@ public class DemoServiceImpl implements DemoService {
         return row + row2;
     }
 
+    /**
+     * 测试分布式事务回滚
+     * @return
+     * @throws Exception
+     */
     @Override
     public int save2() throws Exception {
         log.info("save2");

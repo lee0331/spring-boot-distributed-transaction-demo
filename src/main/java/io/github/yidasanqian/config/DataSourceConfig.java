@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -29,8 +28,11 @@ public class DataSourceConfig {
     private static final String DATASOURCE_DRUID_PRIMARY_PROPERTIES = "datasource/druid-primary.properties";
     private static final String DATASOURCE_DRUID_BUSINESS_PROPERTIES = "datasource/druid-business.properties";
 
-    public static final String CLASSPATH_MAPPER_XML = "classpath:mapper/*/*.xml";
+    private static final String CLASSPATH_MAPPER_XML = "classpath:mapper/*/*.xml";
 
+    /**
+     * druid 公共配置
+     */
     private static Properties commonProperties;
 
     static {
@@ -53,47 +55,40 @@ public class DataSourceConfig {
         return properties;
     }
 
-    //@ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.primary-ds")
+    /**
+     * 设置数据源
+     *
+     * @return
+     * @throws IOException
+     */
     @Primary
-    @Bean("primaryDataSource")
+    @Bean
     public AtomikosDataSourceBean primaryDataSource() throws IOException {
-        /*RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(environment, DRUID_DATASOURCE_PREFIX);
-        Map<String, Object> subProperties = propertyResolver.getSubProperties(".");
-        Properties properties = new Properties();
-        for (Map.Entry<String, Object> entry : subProperties.entrySet()) {
-            properties.setProperty(entry.getKey(), entry.getValue().toString());
-        }*/
-
-        Properties properties = loadDruidProperties(DATASOURCE_DRUID_PRIMARY_PROPERTIES);
-        AtomikosDataSourceBean dataSourceBean = new AtomikosDataSourceBean();
-        DruidXADataSource xaDataSource = new DruidXADataSource();
-        xaDataSource.configFromPropety(properties);
-        dataSourceBean.setXaDataSource(xaDataSource);
-        //dataSourceBean.setXaProperties(properties);
-        return dataSourceBean;
+        return getAtomikosDataSourceBean(DATASOURCE_DRUID_PRIMARY_PROPERTIES);
     }
 
-    // @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.business-ds")
-    @Bean("businessDataSource")
+
+    @Bean
     public AtomikosDataSourceBean businessDataSource() throws IOException {
-         /*RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(environment, DRUID_DATASOURCE_PREFIX);
-         Map<String, Object> subProperties = propertyResolver.getSubProperties(".");
-         Properties properties = new Properties();
-         for (Map.Entry<String, Object> entry : subProperties.entrySet()) {
-             properties.setProperty(entry.getKey(), entry.getValue().toString());
-         }*/
+        return getAtomikosDataSourceBean(DATASOURCE_DRUID_BUSINESS_PROPERTIES);
+    }
 
-        Properties properties = loadDruidProperties(DATASOURCE_DRUID_BUSINESS_PROPERTIES);
+    private AtomikosDataSourceBean getAtomikosDataSourceBean(String dataSourceProperties) throws IOException {
+        Properties properties = loadDruidProperties(dataSourceProperties);
         AtomikosDataSourceBean dataSourceBean = new AtomikosDataSourceBean();
+        // 配置DruidXADataSource
         DruidXADataSource xaDataSource = new DruidXADataSource();
         xaDataSource.configFromPropety(properties);
+        // 设置置AtomikosDataSourceBean XADataSource
         dataSourceBean.setXaDataSource(xaDataSource);
-        //       dataSourceBean.setXaProperties(properties);
-
         return dataSourceBean;
     }
 
-
+    /**
+     * 设置{@link SqlSessionFactoryBean}的数据源
+     * @param primaryDataSource 主数据源
+     * @return
+     */
     @Primary
     @Bean
     public SqlSessionFactoryBean primarySqlSessionFactoryBean(@Qualifier("primaryDataSource") AtomikosDataSourceBean primaryDataSource) {
@@ -105,7 +100,7 @@ public class DataSourceConfig {
         return getSqlSessionFactoryBean(businessDataSource);
     }
 
-    private SqlSessionFactoryBean getSqlSessionFactoryBean(DataSource dataSource) {
+    private SqlSessionFactoryBean getSqlSessionFactoryBean(AtomikosDataSourceBean dataSource) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -117,6 +112,11 @@ public class DataSourceConfig {
         return sqlSessionFactoryBean;
     }
 
+    /**
+     * 搜索{@link DataSourceConfig#PRIMARY_MAPPER_BASE_PACKAGE} 包下的Mapper接口，并且将这些接口
+     * 交由{@link MapperScannerConfigurer#sqlSessionFactoryBeanName} 属性设置的SqlSessionFactoryBean管理
+     * @return
+     */
     @Bean
     public MapperScannerConfigurer primaryMapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
@@ -125,6 +125,11 @@ public class DataSourceConfig {
         return mapperScannerConfigurer;
     }
 
+    /**
+     * 搜索{@link DataSourceConfig#BUSINESS_MAPPER_BASE_PACKAGE} 包下的Mapper接口，并且将这些接口
+     * 交由{@link MapperScannerConfigurer#sqlSessionFactoryBeanName} 属性设置的SqlSessionFactoryBean管理
+     * @return
+     */
     @Bean
     public MapperScannerConfigurer businessMapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
